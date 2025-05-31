@@ -2,251 +2,109 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>面接対策フラッシュカードゲーム</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Noto Sans JP', 'Inter', sans-serif;
-            background-color: #f0f4f8;
-            -webkit-text-size-adjust: 100%;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
+            background-color: #f0f4f8; /* Light blue-gray background */
         }
-        
         .flashcard-container {
             background-color: #ffffff;
             border-radius: 12px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             transition: all 0.3s ease-in-out;
-            min-height: 300px;
         }
-        
+        .flashcard-container:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
         .btn {
             transition: background-color 0.3s ease, transform 0.1s ease;
             border-radius: 8px;
-            padding: 1rem 1.5rem;
+            padding: 0.75rem 1.5rem;
             font-weight: 500;
-            border: none;
-            cursor: pointer;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            min-height: 48px; /* iOSタッチターゲットサイズ */
         }
-        
-        .btn:hover, .btn:focus {
+        .btn:hover {
             opacity: 0.9;
-            outline: none;
         }
-        
         .btn:active {
             transform: scale(0.98);
         }
-        
         .btn-primary {
-            background-color: #3b82f6;
+            background-color: #3b82f6; /* Blue-500 */
             color: white;
         }
-        
-        .btn-primary:hover, .btn-primary:focus {
-            background-color: #2563eb;
+        .btn-primary:hover {
+            background-color: #2563eb; /* Blue-600 */
         }
-        
         .btn-secondary {
-            background-color: #10b981;
+            background-color: #10b981; /* Emerald-500 */
             color: white;
         }
-        
-        .btn-secondary:hover, .btn-secondary:focus {
-            background-color: #059669;
+        .btn-secondary:hover {
+            background-color: #059669; /* Emerald-600 */
         }
-        
-        .btn-danger {
-            background-color: #ef4444;
-            color: white;
-        }
-        
-        .btn-danger:hover, .btn-danger:focus {
-            background-color: #dc2626;
-        }
-        
         #answer-area {
-            background-color: #f9fafb;
-            border: 1px solid #e5e7eb;
+            background-color: #f9fafb; /* Gray-50 */
+            border: 1px solid #e5e7eb; /* Gray-200 */
             border-radius: 8px;
             padding: 1rem;
         }
-        
+        /* Custom scrollbar for answer text if it overflows */
         #answer-text {
-            max-height: 250px;
+            max-height: 300px; /* Adjust as needed */
             overflow-y: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            line-height: 1.75;
-            -webkit-overflow-scrolling: touch; /* iOSスムーススクロール */
+            white-space: pre-wrap; /* Preserve line breaks and spaces */
+            word-wrap: break-word; /* Break long words */
         }
-        
-        #question-text {
-            line-height: 1.75;
-            word-wrap: break-word;
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-            user-select: text;
-        }
-        
-        /* スクロールバースタイリング */
+         /* Scrollbar styling for WebKit browsers (Chrome, Safari) */
         #answer-text::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
-        
         #answer-text::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 10px;
         }
-        
         #answer-text::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
+            background: #888;
             border-radius: 10px;
         }
-        
         #answer-text::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-        
-        /* iPhoneの小さい画面用の調整 */
-        @media (max-width: 480px) {
-            .flashcard-container {
-                padding: 1rem !important;
-                margin: 0.5rem;
-            }
-            
-            #answer-text {
-                max-height: 200px;
-                font-size: 0.95rem;
-            }
-            
-            #question-text {
-                font-size: 1rem;
-            }
-            
-            .btn {
-                padding: 0.875rem 1rem;
-                font-size: 0.95rem;
-            }
-            
-            h1 {
-                font-size: 1.5rem !important;
-            }
-        }
-        
-        /* 非常に小さい画面用 */
-        @media (max-width: 360px) {
-            body {
-                padding: 0.5rem;
-            }
-            
-            .flashcard-container {
-                padding: 0.75rem !important;
-            }
-            
-            #answer-text {
-                max-height: 180px;
-                font-size: 0.9rem;
-            }
-            
-            #question-text {
-                font-size: 0.95rem;
-            }
-        }
-        
-        /* ランドスケープモード対応 */
-        @media (orientation: landscape) and (max-height: 500px) {
-            body {
-                padding: 1rem;
-            }
-            
-            .flashcard-container {
-                min-height: auto;
-            }
-            
-            #answer-text {
-                max-height: 150px;
-            }
-        }
-        
-        /* iOSのSafariでのフォント調整 */
-        @supports (-webkit-touch-callout: none) {
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans JP', 'Inter', sans-serif;
-            }
-        }
-        
-        /* フォーカス時のアウトライン（アクセシビリティ） */
-        .btn:focus-visible {
-            outline: 2px solid #3b82f6;
-            outline-offset: 2px;
-        }
-        
-        /* ローディング状態のスタイル */
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-        
-        /* アニメーション */
-        .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            background: #555;
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-2 sm:p-4">
+<body class="flex items-center justify-center min-h-screen p-4">
     <div class="w-full max-w-2xl">
-        <header class="text-center mb-6 sm:mb-8">
-            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">面接対策フラッシュカード</h1>
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">面接対策フラッシュカード</h1>
         </header>
 
-        <div id="flashcard-counter" class="text-center text-gray-600 mb-3 sm:mb-4 font-medium text-sm sm:text-base"></div>
+        <div id="flashcard-counter" class="text-center text-gray-600 mb-4 font-medium"></div>
 
-        <main id="flashcard" class="flashcard-container p-4 sm:p-6 md:p-8 mb-4 sm:mb-6">
-            <div id="question-area" class="mb-4 sm:mb-6">
-                <h2 class="text-xs sm:text-sm font-semibold text-blue-600 mb-1 tracking-wide">質問：</h2>
-                <p id="question-text" class="text-base sm:text-lg text-gray-800 font-medium"></p>
+        <main id="flashcard" class="flashcard-container p-6 sm:p-8 mb-6">
+            <div id="question-area" class="mb-6">
+                <h2 class="text-sm font-semibold text-blue-600 mb-1">質問：</h2>
+                <p id="question-text" class="text-lg text-gray-800 leading-relaxed"></p>
             </div>
 
-            <button id="toggle-answer-btn" class="btn btn-primary w-full mb-4 sm:mb-6 text-sm sm:text-base">
+            <button id="toggle-answer-btn" class="btn btn-primary w-full mb-6">
                 回答を見る
             </button>
 
             <div id="answer-area" class="hidden">
-                <h3 class="text-xs sm:text-sm font-semibold text-green-600 mb-1 tracking-wide">回答：</h3>
-                <div id="answer-text" class="text-gray-700 text-sm sm:text-base"></div>
+                <h3 class="text-sm font-semibold text-green-600 mb-1">回答：</h3>
+                <p id="answer-text" class="text-gray-700 leading-relaxed"></p>
             </div>
         </main>
 
-        <button id="next-question-btn" class="btn btn-secondary w-full text-sm sm:text-base mb-4">
+        <button id="next-question-btn" class="btn btn-secondary w-full">
             次の質問へ
         </button>
 
-        <div id="completion-message" class="hidden text-center mt-4 sm:mt-6 p-3 sm:p-4 bg-yellow-100 text-yellow-700 rounded-lg border border-yellow-300 text-sm sm:text-base">
+        <div id="completion-message" class="hidden text-center mt-6 p-4 bg-yellow-100 text-yellow-700 rounded-lg border border-yellow-300">
             全ての質問が完了しました！「次の質問へ」ボタンで最初からやり直せます。
         </div>
     </div>
@@ -275,7 +133,7 @@
             },
             {
                 question: "あなたの強みは何ですか？",
-                answer: "仮説思考：\n現状の配信状況を整理して、媒体特性を加味して"今何が起きているか"を仮説を立てて検証していくことが得意\n\n自律性：\n・入社1年目から、Notionの導入や勉強会の開催など、チームに必要であると感じたものを提案してきた\n・最近ではAIにハマってチーム用のアプリケーションの開発なども行っている"
+                answer: "仮説思考：\n現状の配信状況を整理して、媒体特性を加味して”今何が起きているか”を仮説を立てて検証していくことが得意\n\n自律性：\n・入社1年目から、Notionの導入や勉強会の開催など、チームに必要であると感じたものを提案してきた\n・最近ではAIにハマってチーム用のアプリケーションの開発なども行っている"
             },
             {
                 question: "あなたの弱みは何ですか？",
@@ -342,30 +200,6 @@
         const flashcardCounterElement = document.getElementById('flashcard-counter');
         const completionMessageElement = document.getElementById('completion-message');
 
-        // タッチイベントの最適化
-        let touchStartY = 0;
-        let touchEndY = 0;
-
-        function handleGesture() {
-            if (touchEndY < touchStartY - 50) {
-                // 上にスワイプ - 次の質問
-                nextQuestion();
-            }
-            if (touchEndY > touchStartY + 50) {
-                // 下にスワイプ - 回答の表示/非表示
-                toggleAnswer();
-            }
-        }
-
-        document.addEventListener('touchstart', e => {
-            touchStartY = e.changedTouches[0].screenY;
-        });
-
-        document.addEventListener('touchend', e => {
-            touchEndY = e.changedTouches[0].screenY;
-            handleGesture();
-        });
-
         function loadCard(index) {
             if (flashcards.length === 0) {
                 questionTextElement.textContent = "質問がありません。";
@@ -378,101 +212,55 @@
 
             const card = flashcards[index];
             questionTextElement.textContent = card.question;
-            answerTextElement.textContent = card.answer;
-            
-            // アニメーション効果を追加
-            const flashcardElement = document.getElementById('flashcard');
-            flashcardElement.classList.add('fade-in');
+            answerTextElement.textContent = card.answer; // `white-space: pre-wrap;` handles newlines
             
             answerAreaElement.classList.add('hidden');
             isAnswerVisible = false;
             toggleAnswerBtn.textContent = '回答を見る';
-            toggleAnswerBtn.className = 'btn btn-primary w-full mb-4 sm:mb-6 text-sm sm:text-base';
+            toggleAnswerBtn.classList.remove('bg-red-500', 'hover:bg-red-700');
+            toggleAnswerBtn.classList.add('btn-primary');
+
 
             flashcardCounterElement.textContent = `質問 ${index + 1} / ${flashcards.length}`;
             completionMessageElement.classList.add('hidden');
-            
-            // アニメーションクラスを削除
-            setTimeout(() => {
-                flashcardElement.classList.remove('fade-in');
-            }, 300);
         }
 
-        function toggleAnswer() {
+        toggleAnswerBtn.addEventListener('click', () => {
             isAnswerVisible = !isAnswerVisible;
             if (isAnswerVisible) {
                 answerAreaElement.classList.remove('hidden');
-                answerAreaElement.classList.add('fade-in');
                 toggleAnswerBtn.textContent = '回答を隠す';
-                toggleAnswerBtn.className = 'btn btn-danger w-full mb-4 sm:mb-6 text-sm sm:text-base';
+                toggleAnswerBtn.classList.remove('btn-primary');
+                toggleAnswerBtn.classList.add('bg-red-500', 'hover:bg-red-700'); // Use a different color for "Hide"
             } else {
                 answerAreaElement.classList.add('hidden');
-                answerAreaElement.classList.remove('fade-in');
                 toggleAnswerBtn.textContent = '回答を見る';
-                toggleAnswerBtn.className = 'btn btn-primary w-full mb-4 sm:mb-6 text-sm sm:text-base';
+                toggleAnswerBtn.classList.remove('bg-red-500', 'hover:bg-red-700');
+                toggleAnswerBtn.classList.add('btn-primary');
             }
-        }
+        });
 
-        function nextQuestion() {
+        nextQuestionBtn.addEventListener('click', () => {
             currentCardIndex++;
             if (currentCardIndex >= flashcards.length) {
-                currentCardIndex = 0; 
+                currentCardIndex = 0; // Loop back to the first question
                 completionMessageElement.classList.remove('hidden');
-                completionMessageElement.classList.add('fade-in');
             } else {
                 completionMessageElement.classList.add('hidden');
-                completionMessageElement.classList.remove('fade-in');
             }
             loadCard(currentCardIndex);
-        }
-
-        // イベントリスナーの設定
-        toggleAnswerBtn.addEventListener('click', toggleAnswer);
-        toggleAnswerBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            toggleAnswer();
         });
 
-        nextQuestionBtn.addEventListener('click', nextQuestion);
-        nextQuestionBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            nextQuestion();
-        });
-
-        // キーボードナビゲーション（iPhoneの外部キーボード対応）
-        document.addEventListener('keydown', (e) => {
-            switch(e.key) {
-                case ' ':
-                case 'Enter':
-                    e.preventDefault();
-                    toggleAnswer();
-                    break;
-                case 'ArrowRight':
-                case 'n':
-                case 'N':
-                    e.preventDefault();
-                    nextQuestion();
-                    break;
-            }
-        });
-
-        // 初期化
+        // Initial load
         if (flashcards.length > 0) {
             loadCard(currentCardIndex);
         } else {
+            // Handle case with no flashcards (though data is provided here)
             questionTextElement.textContent = "表示する質問がありません。";
             toggleAnswerBtn.style.display = 'none';
             nextQuestionBtn.style.display = 'none';
             flashcardCounterElement.textContent = "";
         }
-
-        // ページの可視性が変わった時の処理（バックグラウンドから復帰時）
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                // ページが再表示された時の処理
-                loadCard(currentCardIndex);
-            }
-        });
     </script>
 </body>
 </html>
