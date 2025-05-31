@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>面接対策フラッシュカードゲーム</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            -webkit-text-size-adjust: 100%;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        .flashcard-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease-in-out;
+            min-height: 300px;
+        }
+        
+        .btn {
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            min-height: 48px; /* iOSタッチターゲットサイズ */
+        }
+        
+        .btn:hover, .btn:focus {
+            opacity: 0.9;
+            outline: none;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: #2563eb;
+        }
+        
+        .btn-secondary {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .btn-secondary:hover, .btn-secondary:focus {
+            background-color: #059669;
+        }
+        
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover, .btn-danger:focus {
+            background-color: #dc2626;
+        }
+        
+        #answer-area {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        #answer-text {
+            max-height: 250px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.75;
+            -webkit-overflow-scrolling: touch; /* iOSスムーススクロール */
+        }
+        
+        #question-text {
+            line-height: 1.75;
+            word-wrap: break-word;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+        
+        /* スクロールバースタイリング */
+        #answer-text::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #answer-text::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        #answer-text::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        
+        #answer-text::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* iPhoneの小さい画面用の調整 */
+        @media (max-width: 480px) {
+            .flashcard-container {
+                padding: 1rem !important;
+                margin: 0.5rem;
+            }
+            
+            #answer-text {
+                max-height: 200px;
+                font-size: 0.95rem;
+            }
+            
+            #question-text {
+                font-size: 1rem;
+            }
+            
+            .btn {
+                padding: 0.875rem 1rem;
+                font-size: 0.95rem;
+            }
+            
+            h1 {
+                font-size: 1.5rem !important;
+            }
+        }
+        
+        /* 非常に小さい画面用 */
+        @media (max-width: 360px) {
+            body {
+                padding: 0.5rem;
+            }
+            
+            .flashcard-container {
+                padding: 0.75rem !important;
+            }
+            
+            #answer-text {
+                max-height: 180px;
+                font-size: 0.9rem;
+            }
+            
+            #question-text {
+                font-size: 0.95rem;
+            }
+        }
+        
+        /* ランドスケープモード対応 */
+        @media (orientation: landscape) and (max-height: 500px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .flashcard-container {
+                min-height: auto;
+            }
+            
+            #answer-text {
+                max-height: 150px;
+            }
+        }
+        
+        /* iOSのSafariでのフォント調整 */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans JP', 'Inter', sans-serif;
+            }
+        }
+        
+        /* フォーカス時のアウトライン（アクセシビリティ） */
+        .btn:focus-visible {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        
+        /* ローディング状態のスタイル */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        /* アニメーション */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-2 sm:p-4">
+    <div class="w-full max-w-2xl">
+        <header class="text-center mb-6 sm:mb-8">
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">面接対策フラッシュカード</h1>
+        </header>
+
+        <div id="flashcard-counter" class="text-center text-gray-600 mb-3 sm:mb-4 font-medium text-sm sm:text-base"></div>
+
+        <main id="flashcard" class="flashcard-container p-4 sm:p-6 md:p-8 mb-4 sm:mb-6">
+            <div id="question-area" class="mb-4 sm:mb-6">
+                <h2 class="text-xs sm:text-sm font-semibold text-blue-600 mb-1 tracking-wide">質問：</h2>
+                <p id="question-text" class="text-base sm:text-lg text-gray-800 font-medium"></p>
+            </div>
+
+            <button id="toggle-answer-btn" class="btn btn-primary w-full mb-4 sm:mb-6 text-sm sm:text-base">
+                回答を見る
+            </button>
+
+            <div id="answer-area" class="hidden">
+                <h3 class="text-xs sm:text-sm font-semibold text-green-600 mb-1 tracking-wide">回答：</h3>
+                <div id="answer-text" class="text-gray-700 text-sm sm:text-base"></div>
+            </div>
+        </main>
+
+        <button id="next-question-btn" class="btn btn-secondary w-full text-sm sm:text-base mb-4">
+            次の質問へ
+        </button>
+
+        <div id="completion-message" class="hidden text-center mt-4 sm:mt-6 p-3 sm:p-4 bg-yellow-100 text-yellow-700 rounded-lg border border-yellow-300 text-sm sm:text-base">
+            全ての質問が完了しました！「次の質問へ」ボタンで最初からやり直せます。
+        </div>
+    </div>
+
+    <script>
+        const flashcards = [
+            {
+                question: "自己紹介",
+                answer: "山口零士と申します。\n新卒から現在の会社である株式会社アドインテに約3年間従事し\nWEB広告の運用から、業務効率化・チームのスキルアップ支援を行ってきました。\nまた、インハウスの広告設計も行っており\nその中ではペルソナの設定や広告作成、LP作成のディレクションなどに携わらせていただいております。"
+            },
+            {
+                question: "転職理由",
+                answer: "広告運用を軸としてスキルアップを行いたい\n弊社の運用は、営業が案件を受注し、ディレクションチームが顧客とのコミュニケーションを行い、そこから降りて来た内容を入稿・運用していく形となっております。\nそのため、クライアントの状況に応じた広告ブランの設計や自由度の高い改善提案は行うことができません。\n一方で広告運用者としてスキルアップをしていくには業務の幅が狭いと感じており\n今後はプランニングから設計・運用までを一貫して担当し、必要に応じてクライアントとも直接コミュニケーションを取りながら、状況に応じた柔軟な運用改善ができるような環境に身を置きたいと考えています。"
+            },
+            {
+                question: "志望理由( 業界/職種 )",
+                answer: "広告運用の仕事が好きであることと、まだまだやり切れていないと感じているためです。\n私は、現在の職種を引きついだ転職活動を行っておりますが、\nその理由は前提として、広告運用の楽しさにあります。\n広告運用では状況に応じて仮説を建て検証を行っていくフローがありますがそこに楽しさを覚えます。\nまた、まだこの職業をやり切れていないと感じていることも多く、より経験を積みスキルアップしていきたいと考えております。\n\n今の会社では広告の運用ということはできますが、配信途中での最適化、顧客のニーズに合わせたプランニングや提案などができておりません。\n私は現段階でWEB広告の運用は楽しいと考えております。だからこそ、より豊富な経験ができる会社へと転職したいと考えております。"
+            },
+            {
+                question: "キャリアについて",
+                answer: "短期：\n短期的には運用者としてのスキルアップを目指したいと考えております。\n媒体の特性や設計を深く理解し、メディアプランニングの提案や顧客斥候もできるようになっていきたいです。\nまた、それらをチームに対して還元できるような存在になりたいです。\n\n中期：\n中期的には、広告運用のスキルに加えて、クライアントの課題を深く理解した上で上流の戦略設計にも関わっていきたいと考えています。\nまた、自分の知見や検証結果をチーム内で共有・体系化し、配信について迷ったらまず山口さんに相談しようといったスペシャリストになりたいと考えております。\nそのためにも、運用や改善を多く経験し、それに合わせた提案を行い、その結果を蓄積していきたいと考えております。"
+            },
+            {
+                question: "1社目の入社/退社理由",
+                answer: "他のWeb広告会社と比較して、最も特殊に映ったため。\n私は広告に携わる環境を求めて就職活動をしてきましたが、その中で、最も特殊で独自なサービスを構築しているのが今の会社でした。\n特にWeb広告の会社は、差別化が難しいと言われる中で、ベンチャーでありながら自社サービスの開発から実装まで行っているという環境に魅力を感じて入社を決意いたしました。\n\n▼実際どうだった？\n確かに特殊なサービスでの広告配信を行っているという点で学びはありました。\n他方でそれはプロダクトアウト型であることも意味しており、不自由さを感じる部分が多かった。"
+            },
+            {
+                question: "あなたの強みは何ですか？",
+                answer: "仮説思考：\n現状の配信状況を整理して、媒体特性を加味して"今何が起きているか"を仮説を立てて検証していくことが得意\n\n自律性：\n・入社1年目から、Notionの導入や勉強会の開催など、チームに必要であると感じたものを提案してきた\n・最近ではAIにハマってチーム用のアプリケーションの開発なども行っている"
+            },
+            {
+                question: "あなたの弱みは何ですか？",
+                answer: "作業の正確性\n・入稿などの細かい作業の連続の場合に抜けもれ発生しうる\n　▶振り返るためのチェックポイントを意識して作るようにしています。\n　▶入稿を例に出すと、私は自信独自の入稿チェックリストを作っており、それを基に自身の作業に対しての抜けもれがないかを都度確認するタイミングを作っています。"
+            },
+            {
+                question: "(不得意な業務に関して)依頼されることがあったらどのようにしますか？",
+                answer: "不得意な部分を補う方法を考えます。\n不得意であるということは、知識に加え、自身のスキル、特性、経験のどれかが不足していると言うことです。\nそのため、まずはその不足を明確化して、それを外部で補う方法がないかを考えます。\n知識はその場で身に着けることができますが、後者3つに関してはすぐに得られるものではないため、その場ではアウトソーシングできる方法を模索します。"
+            },
+            {
+                question: "業務における成功体験と失敗体験",
+                answer: "広告配信におけるミスが立て続けに起きた。\n年末に差し掛かり、普段の案件数の倍近い数を担当することが増え、それに伴いミスが何度か連続で発生させるタイミングがありました。\n内容は案件に寄りますが、単純な設計ミスに加えてコミュニケーションエラーによるミスも発生。\nまた、ミスを挽回するために焦ってさらにミスを重ねるということもありました。"
+            },
+            {
+                question: "(失敗体験)をどう乗り越えましたか？何か得たものはありましたか？",
+                answer: "自身のミスについての要素分解を行い、仕事のクオリティの担保を外部に頼ることにした。\n自信がそれまで起こしたミスについての要素分解を行い、それぞれを未然に防ぐための対応策を策定しました。\nまた、その中で自身の業務量に合わせて質が低くなることを問題視し、自身の入稿の情報整理や進行状況を可視化するガイドラインをスプレッドシートで作成。\n忙しい状況で見逃しが発生しうる場合にも、そのシートを参照することで未然に防げるような仕事の質の担保の外部化を行った。"
+            },
+            {
+                question: "主体的に動いて残した実績",
+                answer: "1年ほど運用内での勉強会を運営している\n当時、私たち運用者は営業から依頼を受け、それを入稿し配信、レポーティングをするだけの業務でした。\nそれに対し、私としてはWebマーケターとしてマーケティングの知識を基に提案をできたり、Web広告の運用者として改善ができるような会社にしたいと思い\nチームのメンバーに働きかけて月に1度の勉強会を開催することにしました。\nその結果、チーム全体の運用力や提案力が少しずつですが上がってきており、継続していただく案件が増えた。"
+            },
+            {
+                question: "勉強会の運営で特に工夫した点は何ですか？",
+                answer: "ニーズに合わせて内容をピポットしていったことにあると考えております。\n-勉強会を開催当初は、お互いにマーケティング関連の本を読んできてその内容をスライドに落とし込み、それ基に発表していくという内容をしていました。\nしかし、アンケートの結果として「準備が大変である」「現在の仕事との関連性を掴みにくくモチベーションが湧かない」というご指摘を受けまして\n内容を、より現在の業務に近く、今よりも1つか2つ自身のスキルに付加価値を与えられるような内容にシフトしていきました。"
+            },
+            {
+                question: "組織ではどのような役割を果たすことが多いか、周りからどのような人だと言われますか",
+                answer: "人の先頭に立ち、引っ張っていくリーダー的な立ち位置。何かを教える先生。\nリーダーになりたいと思っているというよりは、人よりも「こうしたい」というビジョンを持ち、それを提案していくことで結果的にリーダーになっている状況です。"
+            },
+            {
+                question: "あなたの仕事におけるモットーや指針は何ですか？",
+                answer: "「ファスト・デザイン・レジリエント」のを自身の標語として意識しております\n-誰よりも早く、そしてその仕事に合わせて付加価値をつけた状態で行う攻めの姿勢。\nまた、失敗したり危機的な状況に陥った時にも即座に状況に合わせて対応を行うというレジリエントを意識しています。"
+            },
+            {
+                question: "併願企業はどのような企業が多いか",
+                answer: "現在のアドインテよりも規模が大きく、運用に力を入れている広告会社\n現在の仕事であるWeb広告の運用を活かすことができる職種であり、かつ予算が大きくKPIの達成に向けてプランニングの段階から参加ができるような大きい企業への就職を目指している。"
+            },
+            {
+                question: "現職の事業内容と組織構成の説明",
+                answer: "事業内容としては大きく分けて3つあります。\nリテールメディアや位置情報配信を行う広告配信事業\nAIBeaconやAIカメラ、独自のDMPを用いた分析を行うDX事業\nロケーションメディア型の自動販売機を展開するAIICO事業です。\n\n広告配信事業では、リテールメディアと位置情報配信にサービスが分かれており、それぞれ30名程度の計60名\nDX事業で30名、AIICO事業で20名\nその他開発やマネジメント部門を合わせて合計180名の会社となっております、\n\n私は広告配信事業のリテールメディアサービスに所属しており\nゼネラルマネージャー、シニアマネージャーのもと、並列の組織になっており\n案件を獲得する営業チーム、案件の進行・斥候を行うディレクションを行うチーム、広告運用チームと\n分かれて広告代理業サービスを提供しております。"
+            },
+            {
+                question: "転職に際して重要な決定軸は？",
+                answer: "広告の運用や、改善ロジックの立案や検証を行っていきたいため \n1年目から改善の提案や検証などの挑戦をさせてくれるような会社"
+            },
+            {
+                question: "職務上のミッションは何？",
+                answer: "広告運用者ですのでメインのミッションとしては、パフォーマンス改善となります。 \n改善の提案及びその実績を評価指標として追っており \n半期の50件の提案目標、30件の実際の改善目標として追っており、そのどちらも100％で達成することができました。 \n\n定性面では運用チーム全体のスキル向上を担っておりますので \n月に1度の勉強会の運用やチーム内ので教育等を行っております。"
+            },
+            {
+                question: "過去に直面した困難な状況や問題は何でしたか？またそれをどのように解決しましたか？",
+                answer: "自社の検索広告において、思うようにコンバージョンが取れていなかったが\nよりニーズの高い顧客は、「店舗の集客をするにはどうしたらよいか？」などのように\nよりKWベースではなく、欲求ベースで検索するのではないかと仮説を立て、検索語句を見たが\n実際に不明の検索語句でコンバージョンに行きついている場合が多いことを発見した。\nそこで、フレーズ一致KWのみの採用から部分一致に切り替えて配信の検証を行ったところCPAが1/3程度まで改善した。"
+            }
+        ];
+
+        let currentCardIndex = 0;
+        let isAnswerVisible = false;
+
+        const questionTextElement = document.getElementById('question-text');
+        const answerTextElement = document.getElementById('answer-text');
+        const answerAreaElement = document.getElementById('answer-area');
+        const toggleAnswerBtn = document.getElementById('toggle-answer-btn');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const flashcardCounterElement = document.getElementById('flashcard-counter');
+        const completionMessageElement = document.getElementById('completion-message');
+
+        // タッチイベントの最適化
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        function handleGesture() {
+            if (touchEndY < touchStartY - 50) {
+                // 上にスワイプ - 次の質問
+                nextQuestion();
+            }
+            if (touchEndY > touchStartY + 50) {
+                // 下にスワイプ - 回答の表示/非表示
+                toggleAnswer();
+            }
+        }
+
+        document.addEventListener('touchstart', e => {
+            touchStartY = e.changedTouches[0].screenY;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchEndY = e.changedTouches[0].screenY;
+            handleGesture();
+        });
+
+        function loadCard(index) {
+            if (flashcards.length === 0) {
+                questionTextElement.textContent = "質問がありません。";
+                answerAreaElement.classList.add('hidden');
+                toggleAnswerBtn.disabled = true;
+                nextQuestionBtn.disabled = true;
+                flashcardCounterElement.textContent = "0 / 0";
+                return;
+            }
+
+            const card = flashcards[index];
+            questionTextElement.textContent = card.question;
+            answerTextElement.textContent = card.answer;
+            
+            // アニメーション効果を追加
+            const flashcardElement = document.getElementById('flashcard');
+            flashcardElement.classList.add('fade-in');
+            
+            answerAreaElement.classList.add('hidden');
+            isAnswerVisible = false;
+            toggleAnswerBtn.textContent = '回答を見る';
+            toggleAnswerBtn.className = 'btn btn-primary w-full mb-4 sm:mb-6 text-sm sm:text-base';
+
+            flashcardCounterElement.textContent = `質問 ${index + 1} / ${flashcards.length}`;
+            completionMessageElement.classList.add('hidden');
+            
+            // アニメーションクラスを削除
+            setTimeout(() => {
+                flashcardElement.classList.remove('fade-in');
+            }, 300);
+        }
+
+        function toggleAnswer() {
+            isAnswerVisible = !isAnswerVisible;
+            if (isAnswerVisible) {
+                answerAreaElement.classList.remove('hidden');
+                answerAreaElement.classList.add('fade-in');
+                toggleAnswerBtn.textContent = '回答を隠す';
+                toggleAnswerBtn.className = 'btn btn-danger w-full mb-4 sm:mb-6 text-sm sm:text-base';
+            } else {
+                answerAreaElement.classList.add('hidden');
+                answerAreaElement.classList.remove('fade-in');
+                toggleAnswerBtn.textContent = '回答を見る';
+                toggleAnswerBtn.className = 'btn btn-primary w-full mb-4 sm:mb-6 text-sm sm:text-base';
+            }
+        }
+
+        function nextQuestion() {
+            currentCardIndex++;
+            if (currentCardIndex >= flashcards.length) {
+                currentCardIndex = 0; 
+                completionMessageElement.classList.remove('hidden');
+                completionMessageElement.classList.add('fade-in');
+            } else {
+                completionMessageElement.classList.add('hidden');
+                completionMessageElement.classList.remove('fade-in');
+            }
+            loadCard(currentCardIndex);
+        }
+
+        // イベントリスナーの設定
+        toggleAnswerBtn.addEventListener('click', toggleAnswer);
+        toggleAnswerBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            toggleAnswer();
+        });
+
+        nextQuestionBtn.addEventListener('click', nextQuestion);
+        nextQuestionBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            nextQuestion();
+        });
+
+        // キーボードナビゲーション（iPhoneの外部キーボード対応）
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case ' ':
+                case 'Enter':
+                    e.preventDefault();
+                    toggleAnswer();
+                    break;
+                case 'ArrowRight':
+                case 'n':
+                case 'N':
+                    e.preventDefault();
+                    nextQuestion();
+                    break;
+            }
+        });
+
+        // 初期化
+        if (flashcards.length > 0) {
+            loadCard(currentCardIndex);
+        } else {
+            questionTextElement.textContent = "表示する質問がありません。";
+            toggleAnswerBtn.style.display = 'none';
+            nextQuestionBtn.style.display = 'none';
+            flashcardCounterElement.textContent = "";
+        }
+
+        // ページの可視性が変わった時の処理（バックグラウンドから復帰時）
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                // ページが再表示された時の処理
+                loadCard(currentCardIndex);
+            }
+        });
+    </script>
+</body>
+</html>
